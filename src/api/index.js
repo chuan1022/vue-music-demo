@@ -1,13 +1,13 @@
 import jsonp from './jsonp'
 import axios from 'axios'
-import _ from 'lodash'
+// import _ from 'lodash'
 import {
   commonParams,
   options
 } from './config'
 
 //banner
-export const getRecommentList = () => {
+export function getRecommentList() {
   let url = 'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg'
   const data = Object.assign({}, commonParams, {
     platform: 'h5',
@@ -18,7 +18,7 @@ export const getRecommentList = () => {
 }
 
 //歌单推荐列表
-export const getDiscList = (page) => {
+export function getDiscList(page) {
   let url = 'api/getDiscList'
   const data = Object.assign({}, commonParams, {
     platform: 'yqq',
@@ -40,7 +40,7 @@ export const getDiscList = (page) => {
 }
 
 //歌手列表
-export const getSingerList = () => {
+export function getSingerList() {
   let url = 'https://c.y.qq.com/v8/fcg-bin/v8.fcg'
   const data = Object.assign({}, commonParams, {
     channel: 'singer',
@@ -56,7 +56,7 @@ export const getSingerList = () => {
 }
 
 //歌手信息
-export const getSingerDetail = (singerId) => {
+export function getSingerDetail(singerId) {
   let url = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_singer_track_cp.fcg'
   const data = Object.assign({}, commonParams, {
     hostUin: 0,
@@ -76,7 +76,7 @@ function jsonp1(data) {
   return data
 }
 //歌词
-export const getLyric = (song) => {
+export function getLyric(song) {
   let url = 'api/getLyric'
   const data = Object.assign({}, commonParams, {
     g_tk: 5381,
@@ -105,7 +105,7 @@ export const getLyric = (song) => {
 }
 
 //热门歌单歌曲列表
-export const getDiscSongList = (id) => {
+export function getDiscSongList(id) {
   const url = 'api/getDiscSongList'
   const data = Object.assign({}, commonParams, {
     disstid: id,
@@ -132,7 +132,7 @@ export const getDiscSongList = (id) => {
   })
 }
 //排行版
-export const getRanks = (id) => {
+export function getRanks(id) {
   const url = 'api/getRanks'
   const data = Object.assign({}, commonParams, {
 
@@ -151,7 +151,7 @@ export const getRanks = (id) => {
   })
 }
 //rank songs
-export const getTopSongList = (id)=> {
+export function getTopSongList(id) {
   const url = 'api/getRankSongList'
   const data = Object.assign({}, commonParams, {
     type: 'top',
@@ -161,6 +161,48 @@ export const getTopSongList = (id)=> {
     platform: 'h5',
     needNewCode: 1,
     topid: id,
+    _: new Date().getTime()
+  })
+
+  return axios.get(url, {
+    params: data
+  }).then((res) => {
+    return Promise.resolve(res.data)
+  })
+}
+//hotkey
+export function getHotKey() {
+  const url = 'api/getHotKey'
+  const data = Object.assign({}, commonParams, {
+    platform: 'h5',
+    needNewCode: 1,
+    _: new Date().getTime()
+  })
+
+  return axios.get(url, {
+    params: data
+  }).then((res) => {
+    return Promise.resolve(res.data)
+  })
+}
+//search
+export function search(key) {
+  const url = 'api/search'
+  const data = Object.assign({}, commonParams, {
+    g_tk: 5381,
+    w: key,
+    format:'json',
+    zhidaqu: 1,
+    catZhida: 1,
+    t: 0,
+    flag: 1,
+    ie: 'utf-8',
+    sem: 1,
+    aggr: 0,
+    perpage: 20,
+    n: 20,
+    p: 1,
+    remoteplace: 'txt.mqq.all',
     _: new Date().getTime()
   })
 

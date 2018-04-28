@@ -109,6 +109,28 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           }).catch((e) => {
             console.log(e)
           })
+        }),
+        app.get('/api/getHotKey', (req, res) => {
+          var url = 'https://c.y.qq.com/splcloud/fcgi-bin/gethotkey.fcg'
+          axios.get(url, {
+            referer:'https://m.y.qq.com/',
+            origin: 'https://m.y.qq.com',
+            params: req.query
+          }).then((response) => {
+            res.json(response.data)
+          }).catch((e) => {
+            console.log(e)
+          })
+        }),
+        app.get('/api/search', (req, res) => {
+          var url = 'https://c.y.qq.com/soso/fcgi-bin/search_for_qq_cp'
+          axios.get(url, {
+            params: req.query
+          }).then((response) => {
+            res.json(response.data)
+          }).catch((e) => {
+            console.log(e)
+          })
         })
     },
     clientLogLevel: 'warning',

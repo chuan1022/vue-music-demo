@@ -41,7 +41,7 @@ export function createSong(musicData) {
   })
 }
 
-function formatSinger(singer) {
+export function formatSinger(singer) {
   if (!singer) {
     return ''
   }
