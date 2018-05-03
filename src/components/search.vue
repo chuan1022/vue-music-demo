@@ -8,24 +8,31 @@
       </ul>
     </div>
     <div class="search_list" v-show="key&&searchRes">
-      <ul>
-        <li v-if="singer" @click="toSinger()">
-          <div class="singer_item">
-            <img class="avatar" :src="singer.avatar" alt="">
-            <p class="name">{{singer.name}}</p>
-          </div>
-        </li>
-        <li v-if="song.albumname" @click="toSong()">
-          <div class="singer_item">
-            <img class="avatar" :src="singer.avatar" alt="">
-            <p class="name">{{song.albumname}} - {{song.singername}}</p>
-          </div>
-          
-        </li>
-        <li v-if="songList" v-for="(item,index) in songList" :key="index"  @click="toSong()"> 
-          {{item.songname}} - {{formatSinger(item.singer)}}
-        </li>
-      </ul>
+      <scroll-view class="scroll" ref="scroll">
+        <ul>
+          <li v-if="singer.id" @click="toSinger()">
+            <div class="singer_item">
+              <img class="avatar" :src="singer.avatar" alt="">
+              <p class="name">{{singer.name}}</p>
+            </div>
+          </li>
+          <li v-if="song.mid" @click="toSong()">
+            <div class="singer_item">
+              <img class="avatar" :src="song.image" alt="">
+              <p class="name">{{song.name}} - {{song.singer}}</p>
+            </div>
+            
+          </li>
+          <li v-if="songList.length" class="song_list">
+            <ul>  
+              <li class="name"  v-for="(item,index) in songList" :key="index"  @click="toSong(songList,index)"> 
+                <i class="iconfont">&#xe634;</i>
+                {{item.name}} - {{item.singer}}
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </scroll-view>
     </div>
   </div>
 </template>
@@ -35,9 +42,10 @@ import searchBox from "@/assets/vue/search-box";
 import { getHotKey, search } from "@/api/index";
 import { ERR_OK } from "@/api/config";
 import Singer from "@/assets/js/singer";
-import Song from "@/assets/js/song";
-
-import { mapMutations } from "vuex";
+import { Song, createSong } from "@/assets/js/song";
+import scrollView from '@/assets/vue/scroll-view'
+import { mapMutations, mapActions } from "vuex";
+import index from '../../node_modules/._vue@2.5.16@vue';
 
 export default {
   data() {
@@ -49,7 +57,7 @@ export default {
   },
   computed: {
     songList() {
-      return this.searchRes.song ? this.searchRes.song.list : [];
+      return this.searchRes.song ? this.formatSongList(this.searchRes.song.list) : [];
     },
     singer() {
       //歌手直达 2
@@ -58,33 +66,49 @@ export default {
           id: this.searchRes.zhida.singermid,
           name: this.searchRes.zhida.singername
         });
-        // return this.searchRes.zhida;
       } else {
         return {};
       }
     },
     song() {
+      let data = this.searchRes.zhida;
       //歌曲直达
       if (this.searchRes.zhida && this.searchRes.zhida.type === 3) {
-        // return new Song({
-        //   mid: this.searchRes.zhida.albummid,
-        //   id: this.searchRes.zhida.albumid,
-        //   name: this.searchRes.zhida.albumname,
-        //   singer: this.searchRes.zhida.singername
-        // });
-        return this.searchRes.zhida;
+        let musicdata = {
+          songmid: this.searchRes.zhida.albummid,
+          songid: this.searchRes.zhida.albumid,
+          songname: this.searchRes.zhida.albumname,
+          albumname: this.searchRes.zhida.albumname,
+          singer: [{ name: this.searchRes.zhida.singername }],
+          albummid: this.searchRes.zhida.albummid,
+          albumid: this.searchRes.zhida.albumid
+        };
+        return createSong(musicdata);
+        // return this.searchRes.zhida;
       } else {
         return {};
       }
     }
   },
   components: {
-    searchBox
+    searchBox,
+    scrollView
   },
   created() {
     this.getHotKey();
   },
   methods: {
+    formatSongList(list) {
+      let arr = [];
+      list.forEach(element => {
+        let musicData = element;
+        console.log(musicData)
+        if (musicData.songid && musicData.albummid) {
+          arr.push(createSong(musicData));
+        }
+      });
+      return arr;
+    },
     change(newVal, oldVal) {
       this.key = newVal;
       console.log(newVal, oldVal);
@@ -115,7 +139,12 @@ export default {
         path: `singer/${this.singer.id}`
       });
     },
-    toSong() {},
+    toSong(songList,index) {
+      this.setPlay({
+        songs:songList,
+        index:index
+      })
+    },
     formatSinger(list) {
       if (!list) {
         return "";
@@ -126,6 +155,10 @@ export default {
       });
       return arr.join("/");
     },
+    ...mapActions({
+      setPlay:'setPlay',
+      setRandomPlay:'setRandomPlay'
+    }),
     ...mapMutations({
       setSinger: "SET_SINGER"
     })
@@ -136,8 +169,12 @@ export default {
       if (newVal) {
         this.search();
       }
+    },
+    searchRes(){
+      this.$refs.scroll.refresh()
     }
-  }
+  },
+
 };
 </script>
 <style lang="less" scoped>
@@ -163,8 +200,16 @@ export default {
     }
   }
   .search_list {
-    margin: 10px;
+    margin: 0 10px;
     color: @color-text-d;
+    position: fixed;
+    top: 140px;
+    bottom: 0;
+    // height: calc(100vh - 130px);
+    .scroll {
+      height: 100%;
+      overflow: hidden;
+    }
     .singer_item {
       display: flex;
       justify-content: flex-start;
@@ -175,13 +220,19 @@ export default {
         width: 40px;
         height: 40px;
         .border-radius(50%);
-        margin: 0 20px;
+        margin-right: 20px;
       }
       .name {
-        flex: 1;
+        flex:  1 0 60px;
         font-size: @font-size-medium;
-        color: @color-text-l;
       }
+    }
+    .song_list{
+      font-size: @font-size-medium;
+      line-height: 40px;
+    }
+    .name{
+      .noWrap();
     }
   }
 }

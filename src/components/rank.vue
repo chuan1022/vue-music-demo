@@ -67,7 +67,6 @@ export default {
   }
   .item {
     display: flex;
-
     // margin-bottom: 15px;
     padding: 10px 0;
     // box-sizing: border-box;

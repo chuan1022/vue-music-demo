@@ -18,7 +18,12 @@ export default {
     data:{
       type:String,
       default: ''
-    }
+    },
+    // //1:搜索歌手、歌曲； 2：搜索歌曲
+    // searchType: {
+    //   type: Number,
+    //   default: 1
+    // }
   },
   data() {
     return {

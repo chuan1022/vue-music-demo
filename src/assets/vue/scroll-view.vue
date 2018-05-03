@@ -19,13 +19,18 @@ export default {
       type: Array,
       default: null
     },
-    pullUpLoad: {
-      type: Boolean,
-      default: false
-    },
     listenScroll: {
       type: Boolean,
       default: false
+    },
+    pullUpLoad: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data(){
+    return {
+      isPullUpLoad: false
     }
   },
   mounted() {
@@ -47,11 +52,18 @@ export default {
       }
       this.scroll = new BScroll(this.$refs.scroll, {
         probeType: this.probeType,
-        click: this.click
+        click: this.click,
+        pullUpLoad:this.pullUpLoad
       });
       if(this.listenScroll){
         this.scroll.on('scroll',(pos) => {
           this.$emit('scroll', pos)
+        })
+      }
+      if(this.pullUpLoad){
+        this.scroll.on('pullingUp', () => {
+          // this.isPullUpLoad = true
+          this.$emit('pullingUp')
         })
       }
     },

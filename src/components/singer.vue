@@ -9,9 +9,10 @@
 // @import "../assets/styles/variable";
 // @import "../assets/styles/mixin";
 .wrapper {
-  position: relative;
-  width: 100%;
-  height: calc(100vh - 88px);    
+  position: fixed;
+  top: 88px;
+  bottom: 0;  
+  overflow: hidden; 
 }
 </style>
 <script>

@@ -26,9 +26,11 @@
 @import "../styles/variable";
 @import "../styles/mixin";
 .wrapper {
-  position: relative;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  top: 88px;
   width: 100%;
-  height: 100%; 
   .listView{
     height: 100%; 
     overflow: hidden;

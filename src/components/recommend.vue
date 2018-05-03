@@ -1,6 +1,10 @@
 <template>
   <div class="wrapper">
-    <scroll-view ref="scroll" class="scroll" :data="discList">
+    <scroll-view ref="scroll" class="scroll" 
+    :data="discList" 
+    :pullUpLoad="true"
+    @pullingUp="pullingUp"
+    >
       <div>
         <slider v-if="recommentList.length">
           <div v-for="(item, index) in recommentList" :key="index">
@@ -34,9 +38,10 @@
 @import "../assets/styles/mixin";
 
 .wrapper {
-  position: relative;
+  position: fixed;
   width: 100%;
-  height: calc(100vh - 88px);
+  top: 88px;
+  bottom: 0;
   .scroll {
     height: 100%;
     overflow: hidden;
@@ -107,7 +112,7 @@ export default {
   },
   methods: {
     ...mapMutations({
-      setDisc:'SET_DISC'
+      setDisc: "SET_DISC"
     }),
     getRecommentList() {
       getRecommentList().then(res => {
@@ -129,10 +134,14 @@ export default {
       this.$refs.scroll.refresh();
     },
     selectItem(item) {
-      this.setDisc(item)
+      this.setDisc(item);
       this.$router.push({
         path: `/recommend/${item.dissid}`
       });
+    },
+    pullingUp() {
+      console.log(11);
+      this.$refs.scroll.finishPullUp();
     }
   }
 };
